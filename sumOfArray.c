@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv) {
     int rank, size;
-    int *array = NULL;
+    int *data = NULL;
     int local_size;
     int *local_data;
     long long local_sum = 0, total_sum = 0;
@@ -28,6 +28,7 @@ int main(int argc, char** argv) {
     double start_time = MPI_Wtime();
 
     MPI_Scatter(data, local_size, MPI_INT, local_data, local_size, MPI_INT, 0, MPI_COMM_WORLD);
+
     for (int i = 0; i < local_size; ++i) {
         local_sum += local_data[i];
     }
@@ -35,15 +36,15 @@ int main(int argc, char** argv) {
     MPI_Reduce(&local_sum, &total_sum, 1, MPI_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
 
     double end_time = MPI_Wtime();
+
     if (rank == 0) {
         printf("Total sum = %lld\n", total_sum);
         printf("Wall time = %f seconds\n", end_time - start_time);
-    }
-
-    if (rank == 0) {
         free(data);
     }
+
     free(local_data);
     MPI_Finalize();
     return 0;
 }
+
